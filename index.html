@@ -20,12 +20,17 @@
             right: 0px;
             display: block;
         }
+
+        input {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <canvas></canvas>
     <audio controls></audio>
+    <input type="file">
     <script>
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         let ctx = new AudioContext();
@@ -33,6 +38,7 @@
         let audio = document.querySelector('audio');
         let canvas = document.querySelector('canvas');
         let tag = document.querySelector('body');
+        let input = document.querySelector('input');
 
         let src = ctx.createMediaElementSource(audio);
 
@@ -116,14 +122,26 @@
         /**
          * Event listeners
         */
-        tag.addEventListener('drop', e => {
-            audio.src = URL.createObjectURL(e.dataTransfer.files[0]);
+        function play(file) {
+            audio.src = URL.createObjectURL(file);
             audio.play();
             ctx.resume();
+        }
+
+        tag.addEventListener('drop', e => {
+            play(e.dataTransfer.files[0]);
             e.preventDefault();
         });
         tag.addEventListener('dragover', e => {
             e.preventDefault();
+        });
+        tag.addEventListener('click', e => {
+            input.click();
+        });
+        input.addEventListener('change', e => {
+            if (input.files[0]) {
+                play(input.files[0]);
+            }
         });
         onresize = function (e) {
             canvas.width = document.body.clientWidth;
